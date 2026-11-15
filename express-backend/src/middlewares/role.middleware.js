@@ -1,4 +1,4 @@
-import { ApiError } from "../utils/ApiError";
+import { ApiError } from "../utils/ApiError.js";
 
 const isAdmin = (req, res, next) => {
   if (req.user && req.user.role === "admin") {
@@ -7,4 +7,5 @@ const isAdmin = (req, res, next) => {
     next(new ApiError(403, "Access denied — Admins only"));
   }
 };
+
 export { isAdmin };

@@ -1,0 +1,339 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Setting {
+  id                  Int      @id @default(1)
+  schoolName          String   @default("Al-Ilm Public High School")
+  schoolUrduName      String   @default("ال выражением پبلک ہائی اسکول")
+  regNo               String   @default("REG-LHR-2014-8842")
+  logoUrl             String   @default("")
+  address             String   @default("Street 4, Sector B-1, Johar Town, Lahore")
+  phone               String   @default("042-35123456")
+  mobile              String   @default("0300-1234567")
+  email               String   @default("info@alilm.edu.pk")
+  principalName       String   @default("Prof. Muhammad Tariq")
+  sessionYear         String   @default("2025-2026")
+  schoolStartTime     String   @default("08:00")
+  lateGraceMinutes    Int      @default(15)
+  lateFinePerDay      Int      @default(50)
+  lateRuleDays        Int      @default(3)
+  casualLeaveQuota    Int      @default(10)
+  medicalLeaveQuota   Int      @default(8)
+  annualLeaveQuota    Int      @default(10)
+  workingDaysPerMonth Int      @default(26)
+  updatedAt           DateTime @updatedAt
+}
+
+model User {
+  id          Int      @id @default(autoincrement())
+  username    String   @unique
+  email       String   @unique
+  password    String
+  name        String
+  role        String   @default("Admin") // "Admin" | "Principal" | "Accountant" | "Teacher"
+  phone       String?
+  designation String?
+  staffId     Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ClassSection {
+  id           Int      @id @default(autoincrement())
+  name         String
+  section      String   @default("A")
+  gradeLevel   Int      @default(1)
+  room         String   @default("Room 101")
+  capacity     Int      @default(40)
+  tuitionFee   Int      @default(3500)
+  admissionFee Int      @default(5000)
+  annualFund   Int      @default(2000)
+  examFee      Int      @default(1000)
+  classTeacher String?  @default("Unassigned")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  students     Student[]
+  subjects     Subject[]
+  attendance   StudentAttendance[]
+  challans     FeeChallan[]
+}
+
+model Subject {
+  id             Int          @id @default(autoincrement())
+  classSectionId Int
+  name           String
+  code           String?
+  totalMarks     Int          @default(100)
+  passingMarks   Int          @default(33)
+  teacherName    String?
+
+  classSection   ClassSection @relation(fields: [classSectionId], references: [id], onDelete: Cascade)
+  results        ExamResult[]
+}
+
+model Student {
+  id                Int      @id @default(autoincrement())
+  admissionNo       String   @unique // Permanent lifetime GR number (e.g. GR-1001)
+  rollNo            String
+  name              String
+  nameUrdu          String?
+  bFormNo           String   // 12345-1234567-1
+  dob               String   // YYYY-MM-DD or DD/MM/YYYY
+  gender            String   @default("Male")
+  religion          String   @default("Islam")
+  bloodGroup        String?
+  previousSchool    String?
+  classSectionId    Int
+  status            String   @default("Active") // "Active" | "Left" | "StruckOff"
+  admissionDate     String
+  leavingDate       String?
+  leavingReason     String?
+  photoUrl          String?
+
+  fatherName        String
+  fatherCnic        String   // 12345-1234567-1 for sibling detection
+  fatherOccupation  String?
+  fatherPhone       String
+  motherName        String?
+  motherPhone       String?
+  guardianName      String?
+  guardianRelation  String?
+  guardianPhone     String?
+  address           String
+  emergencyContact  String?
+  medicalNotes      String?
+
+  discountType      String   @default("None") // "None" | "Sibling" | "StaffChild" | "Concession"
+  discountAmount    Int      @default(0)
+  discountReason    String?
+
+  documentsJson     String?  // JSON string storing document attachments
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  classSection      ClassSection @relation(fields: [classSectionId], references: [id])
+  history           StudentAcademicHistory[]
+  attendance        StudentAttendance[]
+  challans          FeeChallan[]
+  results           ExamResult[]
+  leaves            LeaveApplication[]
+}
+
+model StudentAcademicHistory {
+  id                   Int      @id @default(autoincrement())
+  studentId            Int
+  sessionYear          String
+  className            String
+  section              String
+  finalResult          String?  // "Promoted" | "Passed" | "HeldBack"
+  attendancePercentage Float    @default(0)
+  remarks              String?
+  createdAt            DateTime @default(now())
+
+  student              Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+model StudentAttendance {
+  id             Int          @id @default(autoincrement())
+  studentId      Int
+  classSectionId Int
+  date           String       // YYYY-MM-DD
+  status         String       @default("Present") // "Present" | "Absent" | "Late" | "Leave"
+  remarks        String?
+
+  student        Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  classSection   ClassSection @relation(fields: [classSectionId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, date])
+}
+
+model Staff {
+  id             Int      @id @default(autoincrement())
+  employeeNo     String   @unique
+  name           String
+  cnic           String
+  phone          String
+  email          String?
+  designation    String
+  role           String   @default("Teacher") // "Teacher" | "Staff"
+  qualification  String
+  joinedDate     String
+  status         String   @default("Active") // "Active" | "Left"
+  basicSalary    Int      @default(30000)
+  allowance      Int      @default(0)
+  loanBalance    Int      @default(0)
+  photoUrl       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  attendance     StaffAttendance[]
+  leaves         LeaveApplication[]
+  payrolls       Payroll[]
+}
+
+model StaffAttendance {
+  id           Int      @id @default(autoincrement())
+  staffId      Int
+  date         String   // YYYY-MM-DD
+  checkInTime  String?  // HH:MM
+  checkOutTime String?  // HH:MM
+  isLate       Boolean  @default(false)
+  status       String   @default("Present") // "Present" | "Absent" | "Leave" | "HalfDay"
+  remarks      String?
+
+  staff        Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  @@unique([staffId, date])
+}
+
+model LeaveApplication {
+  id            Int      @id @default(autoincrement())
+  applicantType String   @default("Staff") // "Staff" | "Student"
+  staffId       Int?
+  studentId     Int?
+  leaveType     String   @default("Casual") // "Casual" | "Medical" | "Annual" | "Unpaid"
+  startDate     String
+  endDate       String
+  days          Int      @default(1)
+  reason        String
+  status        String   @default("Pending") // "Pending" | "Approved" | "Rejected"
+  approvedBy    String?
+  remarks       String?
+  createdAt     DateTime @default(now())
+
+  staff         Staff?   @relation(fields: [staffId], references: [id])
+  student       Student? @relation(fields: [studentId], references: [id])
+}
+
+model FeeChallan {
+  id                Int          @id @default(autoincrement())
+  challanNo         String       @unique
+  studentId         Int
+  classSectionId    Int
+  month             String       // e.g. "2026-03"
+  issueDate         String
+  dueDate           String
+  tuitionFee        Int          @default(0)
+  admissionFee      Int          @default(0)
+  annualFund        Int          @default(0)
+  examFee           Int          @default(0)
+  otherCharges      Int          @default(0)
+  otherChargesTitle String?
+  arrears           Int          @default(0)
+  discount          Int          @default(0)
+  fine              Int          @default(0)
+  totalPayable      Int          @default(0)
+  paidAmount        Int          @default(0)
+  balance           Int          @default(0)
+  status            String       @default("Unpaid") // "Unpaid" | "Partial" | "Paid"
+  paymentDate       String?
+  paymentMethod     String?      // "Cash" | "Bank"
+  bankName          String?
+  receivedBy        String?
+  remarks           String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  student           Student      @relation(fields: [studentId], references: [id])
+  classSection      ClassSection @relation(fields: [classSectionId], references: [id])
+}
+
+model Payroll {
+  id                 Int      @id @default(autoincrement())
+  month              String   // e.g. "2026-02"
+  staffId            Int
+  basicSalary        Int
+  allowance          Int      @default(0)
+  workingDays        Int      @default(26)
+  daysPresent        Int      @default(26)
+  approvedLeaves     Int      @default(0)
+  unpaidLeaves       Int      @default(0)
+  latesCount         Int      @default(0)
+  lateDeductionDays  Int      @default(0)
+  absentDeduction    Int      @default(0)
+  lateDeduction      Int      @default(0)
+  loanDeduction      Int      @default(0)
+  otherDeductions    Int      @default(0)
+  bonus              Int      @default(0)
+  netSalary          Int
+  status             String   @default("Generated") // "Generated" | "Paid"
+  paymentDate        String?
+  paymentMethod      String?
+  remarks            String?
+  createdAt          DateTime @default(now())
+
+  staff              Staff    @relation(fields: [staffId], references: [id])
+}
+
+model Expense {
+  id            Int      @id @default(autoincrement())
+  title         String
+  category      String   // "Utility" | "Maintenance" | "Supplies" | "Salary" | "Event" | "Other"
+  amount        Int
+  date          String   // YYYY-MM-DD
+  paidTo        String
+  paymentMethod String   @default("Cash")
+  receiptUrl    String?
+  description   String?
+  recordedBy    String?
+  createdAt     DateTime @default(now())
+}
+
+model ExamTerm {
+  id          Int      @id @default(autoincrement())
+  title       String   // e.g. "Mid Term Examination 2026"
+  sessionYear String   @default("2025-2026")
+  startDate   String
+  endDate     String
+  isLocked    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  results     ExamResult[]
+}
+
+model ExamResult {
+  id             Int          @id @default(autoincrement())
+  examTermId     Int
+  studentId      Int
+  classSectionId Int
+  subjectId      Int
+  totalMarks     Int          @default(100)
+  obtainedMarks  Float        @default(0)
+  grade          String       @default("F")
+  remarks        String?
+
+  examTerm       ExamTerm     @relation(fields: [examTermId], references: [id], onDelete: Cascade)
+  student        Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subject        Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@unique([examTermId, studentId, subjectId])
+}
+
+model DiaryNotice {
+  id             Int      @id @default(autoincrement())
+  type           String   @default("Notice") // "Diary" | "Notice"
+  title          String
+  content        String
+  targetType     String   @default("All") // "All" | "Class"
+  classSectionId Int?
+  date           String   // YYYY-MM-DD
+  createdBy      String
+  createdAt      DateTime @default(now())
+}
+
+model AuditLog {
+  id          Int      @id @default(autoincrement())
+  module      String   // "Fee" | "Marks" | "Salary" | "Attendance" | "Student"
+  action      String   // "Create" | "Update" | "Delete" | "Approve"
+  recordId    String?
+  details     String
+  performedBy String
+  createdAt   DateTime @default(now())
+}

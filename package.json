@@ -1,0 +1,12 @@
+{
+  "name": "school-management-system",
+  "version": "2.0.0",
+  "description": "Enterprise School Management System (Next.js + Express + Prisma SQLite)",
+  "type": "module",
+  "scripts": {
+    "setup": "npm --prefix express-backend run setup",
+    "dev": "node dev.js",
+    "dev:backend": "npm --prefix express-backend run start",
+    "dev:frontend": "npm --prefix frontend run dev"
+  }
+}
