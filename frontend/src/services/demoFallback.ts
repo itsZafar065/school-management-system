@@ -5,8 +5,8 @@ export function getDemoFallback(endpoint: string, options: RequestInit = {}): an
   const body = options.body ? JSON.parse(options.body as string) : {};
 
   // Auth Login
-  if (cleanEndpoint.includes("/auth/login")) {
-    const { username, password } = body;
+  if (cleanEndpoint.includes("login") || cleanEndpoint.includes("auth")) {
+    const { username } = body;
     const lowerUser = (username || "").toLowerCase();
     let role = "Admin";
     let name = "Talha Khan";
@@ -34,7 +34,7 @@ export function getDemoFallback(endpoint: string, options: RequestInit = {}): an
   }
 
   // School Settings
-  if (cleanEndpoint.includes("/settings")) {
+  if (cleanEndpoint.includes("setting")) {
     return {
       id: 1,
       schoolName: "Al-Ilm Public High School",
@@ -58,31 +58,80 @@ export function getDemoFallback(endpoint: string, options: RequestInit = {}): an
   }
 
   // Dashboard Stats
-  if (cleanEndpoint.includes("/dashboard")) {
+  if (cleanEndpoint.includes("dashboard")) {
     return {
       role: "Admin",
-      totalStudents: 124,
-      presentStudentsToday: 112,
-      absentStudentsToday: 8,
-      lateStudentsToday: 4,
-      attendancePercentage: 90,
-      totalStaff: 19,
-      presentStaffToday: 18,
-      lateStaffToday: 1,
-      monthlyFeeTarget: 425000,
-      monthlyFeeCollected: 382000,
-      monthlyFeePending: 43000,
-      defaulterCount: 6,
-      recentAdmissions: [
-        { id: 1, admissionNo: "SMS-001", fullName: "Bilal Bhatti", className: "Play Group (A)", date: "15/11/2026" },
-        { id: 2, admissionNo: "SMS-002", fullName: "Anaya Ansari", className: "Play Group (A)", date: "15/11/2026" },
-        { id: 3, admissionNo: "SMS-003", fullName: "Hussein Jutt", className: "Play Group (A)", date: "15/11/2026" },
+      overview: {
+        totalStudents: 124,
+        totalTeachers: 19,
+        totalClasses: 10,
+        studentAttendancePct: 92,
+        staffPresent: 18,
+        staffLate: 1,
+        feeCollected: 382000,
+        feeOutstanding: 43000,
+        defaultersCount: 6,
+        totalExpenses: 78700,
+        pendingLeaves: 2,
+      },
+      attendanceToday: {
+        date: "15/11/2026",
+        present: 112,
+        absent: 8,
+        late: 4,
+        totalMarked: 124,
+      },
+      recentStudents: [
+        {
+          id: 1,
+          admissionNo: "SMS-001",
+          grNumber: "GR-1001",
+          name: "Bilal Bhatti",
+          fatherName: "Farhan Bhatti",
+          fatherCnic: "35201-2007890-1",
+          admissionDate: "2026-01-10",
+          status: "Active",
+          classSection: { name: "Play Group", section: "A" },
+        },
+        {
+          id: 2,
+          admissionNo: "SMS-002",
+          grNumber: "GR-1002",
+          name: "Anaya Ansari",
+          fatherName: "Ali Ansari",
+          fatherCnic: "35201-2011234-2",
+          admissionDate: "2026-01-12",
+          status: "Active",
+          classSection: { name: "Play Group", section: "A" },
+        },
+        {
+          id: 3,
+          admissionNo: "SMS-003",
+          grNumber: "GR-1003",
+          name: "Hussein Jutt",
+          fatherName: "Ahmed Jutt",
+          fatherCnic: "35201-2015678-1",
+          admissionDate: "2026-01-15",
+          status: "Active",
+          classSection: { name: "Play Group", section: "A" },
+        },
       ],
+      classDistribution: [
+        { name: "Play Group (A)", count: 8, capacity: 40, tuitionFee: 4500 },
+        { name: "Nursery (A)", count: 12, capacity: 35, tuitionFee: 5000 },
+        { name: "Prep (A)", count: 14, capacity: 40, tuitionFee: 5200 },
+        { name: "Class 1 (A)", count: 15, capacity: 35, tuitionFee: 5500 },
+        { name: "Class 9 (A)", count: 20, capacity: 35, tuitionFee: 6500 },
+        { name: "Class 10 (A)", count: 20, capacity: 35, tuitionFee: 7000 },
+      ],
+      setting: {
+        schoolStartTime: "08:00 AM",
+      },
     };
   }
 
   // Classes & Sections
-  if (cleanEndpoint.includes("/classes")) {
+  if (cleanEndpoint.includes("class")) {
     return [
       { id: 1, name: "Play Group", section: "A", classTeacher: "Sir Ahmed Farooq", room: "Room 101", capacity: 40, studentCount: 8 },
       { id: 2, name: "Nursery", section: "A", classTeacher: "Miss Fatima Zahra", room: "Room 102", capacity: 35, studentCount: 12 },
@@ -95,18 +144,20 @@ export function getDemoFallback(endpoint: string, options: RequestInit = {}): an
   }
 
   // Students Register
-  if (cleanEndpoint.includes("/students")) {
+  if (cleanEndpoint.includes("student")) {
     return [
       {
         id: 1,
         admissionNo: "SMS-001",
         grNumber: "GR-1001",
+        name: "Bilal Bhatti",
         fullName: "Bilal Bhatti",
         urduName: "بلال بھٹی",
         fatherName: "Farhan Bhatti",
         fatherCnic: "35201-2007890-1",
         fatherPhone: "0300-2109876",
         dob: "2018-05-12",
+        admissionDate: "2026-01-10",
         gender: "Male",
         classSection: { name: "Play Group", section: "A" },
         status: "Active",
@@ -115,12 +166,14 @@ export function getDemoFallback(endpoint: string, options: RequestInit = {}): an
         id: 2,
         admissionNo: "SMS-002",
         grNumber: "GR-1002",
+        name: "Anaya Ansari",
         fullName: "Anaya Ansari",
         urduName: "عنایہ انصاری",
         fatherName: "Ali Ansari",
         fatherCnic: "35201-2011234-2",
         fatherPhone: "0300-2154321",
         dob: "2018-08-20",
+        admissionDate: "2026-01-12",
         gender: "Female",
         classSection: { name: "Play Group", section: "A" },
         status: "Active",
@@ -129,12 +182,14 @@ export function getDemoFallback(endpoint: string, options: RequestInit = {}): an
         id: 3,
         admissionNo: "SMS-003",
         grNumber: "GR-1003",
+        name: "Hussein Jutt",
         fullName: "Hussein Jutt",
         urduName: "حسین جٹ",
         fatherName: "Ahmed Jutt",
         fatherCnic: "35201-2015678-1",
         fatherPhone: "0300-2201234",
         dob: "2018-02-14",
+        admissionDate: "2026-01-15",
         gender: "Male",
         classSection: { name: "Play Group", section: "A" },
         status: "Active",
@@ -143,12 +198,14 @@ export function getDemoFallback(endpoint: string, options: RequestInit = {}): an
         id: 4,
         admissionNo: "SMS-004",
         grNumber: "GR-1004",
+        name: "Khadija Chaudhry",
         fullName: "Khadija Chaudhry",
         urduName: "خدیجہ چوہدری",
         fatherName: "Farhan Chaudhry",
         fatherCnic: "35201-2017284-2",
         fatherPhone: "0300-2209865",
         dob: "2018-09-01",
+        admissionDate: "2026-01-16",
         gender: "Female",
         classSection: { name: "Play Group", section: "A" },
         status: "Active",
@@ -157,12 +214,14 @@ export function getDemoFallback(endpoint: string, options: RequestInit = {}): an
         id: 5,
         admissionNo: "SMS-005",
         grNumber: "GR-1005",
+        name: "Shahzaib Syed",
         fullName: "Shahzaib Syed",
         urduName: "شاہ زیب سید",
         fatherName: "Ali Syed",
         fatherCnic: "35201-2021605-1",
         fatherPhone: "0300-2259245",
         dob: "2018-04-18",
+        admissionDate: "2026-01-18",
         gender: "Male",
         classSection: { name: "Play Group", section: "A" },
         status: "Active",
@@ -171,12 +230,14 @@ export function getDemoFallback(endpoint: string, options: RequestInit = {}): an
         id: 6,
         admissionNo: "SMS-006",
         grNumber: "GR-1006",
+        name: "Sara Mirza",
         fullName: "Sara Mirza",
         urduName: "سارہ مرزا",
         fatherName: "Ahmed Mirza",
         fatherCnic: "35201-2025926-2",
         fatherPhone: "0300-2308625",
         dob: "2018-11-25",
+        admissionDate: "2026-01-20",
         gender: "Female",
         classSection: { name: "Play Group", section: "A" },
         status: "Active",
@@ -185,12 +246,14 @@ export function getDemoFallback(endpoint: string, options: RequestInit = {}): an
         id: 7,
         admissionNo: "SMS-007",
         grNumber: "GR-1007",
+        name: "Ali Gondal",
         fullName: "Ali Gondal",
         urduName: "علی گوندل",
         fatherName: "Hussein Gondal",
         fatherCnic: "35201-2030247-1",
         fatherPhone: "0300-2358005",
         dob: "2018-06-10",
+        admissionDate: "2026-01-22",
         gender: "Male",
         classSection: { name: "Play Group", section: "A" },
         status: "Active",
@@ -199,12 +262,14 @@ export function getDemoFallback(endpoint: string, options: RequestInit = {}): an
         id: 8,
         admissionNo: "SMS-008",
         grNumber: "GR-1008",
+        name: "Iqra Raja",
         fullName: "Iqra Raja",
         urduName: "اقراء راجہ",
         fatherName: "Mustafa Raja",
         fatherCnic: "35201-2034568-2",
         fatherPhone: "0300-2407385",
         dob: "2018-10-05",
+        admissionDate: "2026-01-25",
         gender: "Female",
         classSection: { name: "Play Group", section: "A" },
         status: "Active",
@@ -213,7 +278,7 @@ export function getDemoFallback(endpoint: string, options: RequestInit = {}): an
   }
 
   // Attendance
-  if (cleanEndpoint.includes("/attendance")) {
+  if (cleanEndpoint.includes("attendance")) {
     return [
       { id: 1, studentId: 1, status: "Present", remarks: null, student: { id: 1, admissionNo: "SMS-001", fullName: "Bilal Bhatti", classSection: { name: "Play Group (A)" } } },
       { id: 2, studentId: 2, status: "Present", remarks: null, student: { id: 2, admissionNo: "SMS-002", fullName: "Anaya Ansari", classSection: { name: "Play Group (A)" } } },
@@ -227,7 +292,7 @@ export function getDemoFallback(endpoint: string, options: RequestInit = {}): an
   }
 
   // Fee Challans
-  if (cleanEndpoint.includes("/fees")) {
+  if (cleanEndpoint.includes("fee")) {
     return [
       {
         id: 1,
@@ -284,7 +349,7 @@ export function getDemoFallback(endpoint: string, options: RequestInit = {}): an
   }
 
   // Staff & Teachers
-  if (cleanEndpoint.includes("/teachers") || cleanEndpoint.includes("/staff")) {
+  if (cleanEndpoint.includes("teacher") || cleanEndpoint.includes("staff")) {
     return [
       { id: 1, name: "Sir Ahmed Farooq", email: "ahmed.farooq@alilm.edu.pk", phone: "0300-1234567", role: "Teacher", designation: "Senior Mathematics Teacher", salary: 55000, joinedDate: "2021-08-15", status: "Active" },
       { id: 2, name: "Miss Fatima Zahra", email: "fatima.zahra@alilm.edu.pk", phone: "0312-9876543", role: "Teacher", designation: "Physics Lecturer", salary: 50000, joinedDate: "2022-01-10", status: "Active" },
@@ -294,7 +359,7 @@ export function getDemoFallback(endpoint: string, options: RequestInit = {}): an
   }
 
   // Payroll
-  if (cleanEndpoint.includes("/payroll")) {
+  if (cleanEndpoint.includes("payroll")) {
     return [
       {
         id: 1,
@@ -330,7 +395,7 @@ export function getDemoFallback(endpoint: string, options: RequestInit = {}): an
   }
 
   // Exams
-  if (cleanEndpoint.includes("/exams")) {
+  if (cleanEndpoint.includes("exam")) {
     return [
       { id: 1, title: "Mid-Term Examination 2026", session: "2025-2026", startDate: "2026-03-10", endDate: "2026-03-22", isLocked: true },
       { id: 2, title: "Final Term Examination 2026", session: "2025-2026", startDate: "2026-06-15", endDate: "2026-06-30", isLocked: false },
@@ -338,7 +403,7 @@ export function getDemoFallback(endpoint: string, options: RequestInit = {}): an
   }
 
   // Leaves
-  if (cleanEndpoint.includes("/leaves")) {
+  if (cleanEndpoint.includes("leave")) {
     return [
       {
         id: 1,
@@ -354,7 +419,7 @@ export function getDemoFallback(endpoint: string, options: RequestInit = {}): an
   }
 
   // Expenses
-  if (cleanEndpoint.includes("/expenses")) {
+  if (cleanEndpoint.includes("expense")) {
     return [
       { id: 1, category: "Utilities", title: "Electricity Bill (IESCO)", amount: 48500, date: "2026-02-05", paymentMethod: "Bank Transfer", status: "Paid" },
       { id: 2, category: "Stationery", title: "Exam Papers and Printing", amount: 18200, date: "2026-02-08", paymentMethod: "Cash", status: "Paid" },
@@ -363,7 +428,7 @@ export function getDemoFallback(endpoint: string, options: RequestInit = {}): an
   }
 
   // Diary
-  if (cleanEndpoint.includes("/diary")) {
+  if (cleanEndpoint.includes("diary") || cleanEndpoint.includes("notice")) {
     return [
       { id: 1, date: "2026-02-15", title: "Mid-Term Syllabus Notice", content: "All parents are notified that syllabus for Class 10 Mid-Terms has been shared.", target: "Whole School" },
     ];

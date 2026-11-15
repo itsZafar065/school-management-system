@@ -8,6 +8,18 @@ export async function apiRequest<T>(
   options: RequestInit = {}
 ): Promise<{ data: T | null; error: string | null; success: boolean; message?: string }> {
   try {
+    const isVercelDemo =
+      typeof window !== "undefined" &&
+      window.location.hostname.includes("vercel.app") &&
+      !process.env.NEXT_PUBLIC_API_URL;
+
+    if (isVercelDemo) {
+      const fallback = getDemoFallback(endpoint, options);
+      if (fallback) {
+        return { data: fallback as T, error: null, success: true, message: "Client demo mode loaded" };
+      }
+    }
+
     const token =
       typeof window !== "undefined" ? localStorage.getItem("sms_token") : null;
 

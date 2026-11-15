@@ -59,7 +59,7 @@ export default function DashboardPage() {
               Enrolled Students
             </div>
             <div className="text-2xl font-bold text-slate-900 tracking-tight mt-1">
-              {loading ? "..." : stats?.overview.totalStudents ?? 0}
+              {loading ? "..." : stats?.overview?.totalStudents ?? 0}
             </div>
             <div className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
@@ -78,10 +78,10 @@ export default function DashboardPage() {
               Staff & Faculty
             </div>
             <div className="text-2xl font-bold text-slate-900 tracking-tight mt-1">
-              {loading ? "..." : stats?.overview.totalTeachers ?? 0}
+              {loading ? "..." : stats?.overview?.totalTeachers ?? 0}
             </div>
             <div className="text-[11px] text-emerald-600 font-medium mt-0.5">
-              {stats?.overview.staffPresent ?? 0} Present Today
+              {stats?.overview?.staffPresent ?? 0} Present Today
             </div>
           </div>
           <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
@@ -96,10 +96,10 @@ export default function DashboardPage() {
               Attendance Today
             </div>
             <div className="text-2xl font-bold text-slate-900 tracking-tight mt-1">
-              {loading ? "..." : `${stats?.overview.studentAttendancePct ?? 0}%`}
+              {loading ? "..." : `${stats?.overview?.studentAttendancePct ?? 0}%`}
             </div>
             <div className="text-[11px] text-slate-400 mt-0.5">
-              {stats?.attendanceToday.present ?? 0} Present / {stats?.attendanceToday.absent ?? 0} Absent
+              {stats?.attendanceToday?.present ?? 0} Present / {stats?.attendanceToday?.absent ?? 0} Absent
             </div>
           </div>
           <div className="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-100">
@@ -114,10 +114,10 @@ export default function DashboardPage() {
               Fee Collections
             </div>
             <div className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight mt-1 truncate">
-              {loading ? "..." : formatPKR(stats?.overview.feeCollected)}
+              {loading ? "..." : formatPKR(stats?.overview?.feeCollected ?? 0)}
             </div>
             <div className="text-[11px] text-rose-600 font-medium mt-0.5 truncate">
-              Arrears: {formatPKR(stats?.overview.feeOutstanding)}
+              Arrears: {formatPKR(stats?.overview?.feeOutstanding ?? 0)}
             </div>
           </div>
           <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
@@ -152,19 +152,19 @@ export default function DashboardPage() {
             <div>
               <span className="text-[11px] text-slate-500 font-medium block">Present</span>
               <span className="text-xl font-bold text-emerald-600">
-                {stats?.attendanceToday.present ?? 0}
+                {stats?.attendanceToday?.present ?? 0}
               </span>
             </div>
             <div className="border-x border-slate-200">
               <span className="text-[11px] text-slate-500 font-medium block">Absent</span>
               <span className="text-xl font-bold text-rose-600">
-                {stats?.attendanceToday.absent ?? 0}
+                {stats?.attendanceToday?.absent ?? 0}
               </span>
             </div>
             <div>
               <span className="text-[11px] text-slate-500 font-medium block">Late Arrival</span>
               <span className="text-xl font-bold text-amber-600">
-                {stats?.attendanceToday.late ?? 0}
+                {stats?.attendanceToday?.late ?? 0}
               </span>
             </div>
           </div>
@@ -178,7 +178,7 @@ export default function DashboardPage() {
               </Link>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-              {stats?.classDistribution.slice(0, 6).map((c) => (
+              {(stats?.classDistribution || []).slice(0, 6).map((c) => (
                 <div key={c.name} className="p-3 border border-slate-200/80 rounded-xl bg-slate-50/50 text-[11px] hover:border-blue-300 transition-colors">
                   <div className="font-bold text-slate-800 text-xs">{c.name}</div>
                   <div className="text-slate-600 mt-0.5">
@@ -249,7 +249,7 @@ export default function DashboardPage() {
           <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
             <span className="text-slate-500">Pending Leave Requests:</span>
             <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-bold">
-              {stats?.overview.pendingLeaves ?? 0} Pending
+              {stats?.overview?.pendingLeaves ?? 0} Pending
             </span>
           </div>
         </div>
