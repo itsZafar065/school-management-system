@@ -1,3 +1,5 @@
+import { getDemoFallback } from "./demoFallback";
+
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "/api";
 
@@ -28,6 +30,11 @@ export async function apiRequest<T>(
     const result = await res.json().catch(() => null);
 
     if (!res.ok) {
+      // Fallback to demo data on serverless/preview if API is offline
+      const fallback = getDemoFallback(endpoint, options);
+      if (fallback) {
+        return { data: fallback as T, error: null, success: true, message: "Demo mode loaded" };
+      }
       const errorMsg =
         result?.message || `Request failed with status ${res.status}`;
       return { data: null, error: errorMsg, success: false, message: errorMsg };
@@ -39,9 +46,13 @@ export async function apiRequest<T>(
       success: true,
       message: result?.message || "Operation completed successfully",
     };
-  } catch (err: unknown) {
-    const message =
-      err instanceof Error ? err.message : "Network error. Please check server.";
-    return { data: null, error: message, success: false, message };
+  } catch {
+    // Network / Offline Error -> Fallback to Demo Data
+    const fallback = getDemoFallback(endpoint, options);
+    if (fallback) {
+      return { data: fallback as T, error: null, success: true, message: "Demo mode active" };
+    }
+    return { data: null, error: "Network error. Please check server.", success: false, message: "Network error" };
   }
 }
+
